@@ -102,10 +102,26 @@ func parseParameters(parametersStr string) (Parameters, error) {
 			return Parameters{}, err
 		}
 	}
+
 	secretsYaml := params["objects"]
-	err = yaml.Unmarshal([]byte(secretsYaml), &parameters.Secrets)
+	// TODO: There is an unnecessary map under objects, instead of just directly storing an array there.
+	// Deserialisation can be simplified a fair bit if we remove it.
+	secretsMap := map[string][]string{}
+	err = yaml.Unmarshal([]byte(secretsYaml), &secretsMap)
 	if err != nil {
 		return Parameters{}, err
+	}
+	secrets, ok := secretsMap["array"]
+	if !ok {
+		return Parameters{}, errors.New("no secrets to read configured")
+	}
+	for _, s := range secrets {
+		var secret Secret
+		err = yaml.Unmarshal([]byte(s), &secret)
+		if err != nil {
+			return Parameters{}, err
+		}
+		parameters.Secrets = append(parameters.Secrets, secret)
 	}
 
 	// Set default values.

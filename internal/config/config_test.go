@@ -21,8 +21,8 @@ func TestParseParameters(t *testing.T) {
 			VaultSkipTLSVerify: true,
 		},
 		Secrets: []Secret{
-			{"bar", "v1/secret/foo", ""},
 			{"bar1", "v1/secret/foo1", ""},
+			{"bar2", "v1/secret/foo2", ""},
 		},
 		VaultKubernetesMountPath:     defaultVaultKubernetesMountPath,
 		KubernetesServiceAccountPath: defaultKubernetesServiceAccountPath,
@@ -51,7 +51,7 @@ func TestParseConfig(t *testing.T) {
 			parameters: map[string]string{
 				"roleName":           "example-role",
 				"vaultSkipTLSVerify": "true",
-				"objects":            "- objectPath: \"v1/secret/foo\"\n  objectName: \"bar\"\n  objectVersion: \"\"\n",
+				"objects":            "array:\n  - |\n    objectPath: \"v1/secret/foo1\"\n    objectName: \"bar1\"\n    objectVersion: \"\"",
 			},
 			expected: Config{
 				TargetPath:     targetPath,
@@ -61,7 +61,7 @@ func TestParseConfig(t *testing.T) {
 					expected.VaultRoleName = roleName
 					expected.TLSConfig.VaultSkipTLSVerify = true
 					expected.Secrets = []Secret{
-						{"bar", "v1/secret/foo", ""},
+						{"bar1", "v1/secret/foo1", ""},
 					}
 					return expected
 				}(),
@@ -105,7 +105,7 @@ func TestParseConfig(t *testing.T) {
 				"vaultAddress":                 "my-vault-address",
 				"vaultKubernetesMountPath":     "my-mount-path",
 				"KubernetesServiceAccountPath": "my-account-path",
-				"objects":                      "- objectPath: \"v1/secret/foo\"\n  objectName: \"bar\"\n  objectVersion: \"\"\n",
+				"objects":                      "array:\n  - |\n    objectPath: \"v1/secret/foo1\"\n    objectName: \"bar1\"\n    objectVersion: \"\"",
 			},
 			expected: Config{
 				TargetPath:     targetPath,
@@ -118,7 +118,7 @@ func TestParseConfig(t *testing.T) {
 					expected.KubernetesServiceAccountPath = "my-account-path"
 					expected.TLSConfig.VaultSkipTLSVerify = true
 					expected.Secrets = []Secret{
-						{"bar", "v1/secret/foo", ""},
+						{"bar1", "v1/secret/foo1", ""},
 					}
 					return expected
 				}(),

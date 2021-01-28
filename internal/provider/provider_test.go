@@ -1,9 +1,6 @@
 package provider
 
 import (
-	"bufio"
-	"bytes"
-	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -108,24 +105,4 @@ func TestWriteSecret(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, tc.permission, info.Mode())
 	}
-}
-
-func countLogsAtLevel(t *testing.T, logs []byte, level string) int {
-	var count int
-	scanner := bufio.NewScanner(bytes.NewReader(logs))
-	for scanner.Scan() {
-		l := scanner.Bytes()
-		var log struct {
-			Level   string `json:"@level"`
-			Message string `json:"@message"`
-		}
-		t.Logf("Unmarshalling %s", string(l))
-		err := json.Unmarshal(l, &log)
-		require.NoError(t, err)
-		if log.Level == level {
-			count++
-		}
-	}
-
-	return count
 }
